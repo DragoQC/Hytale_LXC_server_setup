@@ -9,16 +9,13 @@ JAR_PATH="${HYTALE_DIR}/Server/HytaleServer.jar"
 ASSETS_PATH="${HYTALE_DIR}/Assets.zip"
 WORKDIR="${HYTALE_DIR}/Server"
 
-RUN_USER="hytale"
-RUN_GROUP="hytale"
-
 JAVA_BIN="/usr/bin/java"
 JAVA_ARGS=(-jar "${JAR_PATH}" --assets "${ASSETS_PATH}")
 
 # --- Must run as root ---
 if [[ "${EUID}" -ne 0 ]]; then
   echo "ERROR: This script must be run as root."
-  echo "Example: su -c './install-hytale-service.sh'   (or run it in a root shell)"
+  echo "Example: su -c './create-service.sh' (or run it in a root shell)"
   exit 1
 fi
 
@@ -40,53 +37,32 @@ if [[ ! -x "${JAVA_BIN}" ]]; then
   exit 1
 fi
 
-# --- Create system user/group if missing ---
-if ! getent group "${RUN_GROUP}" >/dev/null 2>&1; then
-  groupadd --system "${RUN_GROUP}"
-fi
-
-if ! id -u "${RUN_USER}" >/dev/null 2>&1; then
-  useradd \
-    --system \
-    --gid "${RUN_GROUP}" \
-    --home-dir "${HYTALE_DIR}" \
-    --shell /usr/sbin/nologin \
-    "${RUN_USER}"
-fi
-
-# --- Permissions (server can write logs/config as needed) ---
+# Ensure base dir exists (keep ownership as-is; root is fine)
 mkdir -p "${HYTALE_DIR}"
-chown -R "${RUN_USER}:${RUN_GROUP}" "${HYTALE_DIR}"
 
-# --- Write systemd unit ---
+# --- Write systemd unit (runs as root by default) ---
 cat > "${SERVICE_FILE}" <<EOF
 [Unit]
-Description=Hytale Server
+Description=Hytale Server (root)
 After=network-online.target
 Wants=network-online.target
 
 [Service]
 Type=simple
-User=${RUN_USER}
-Group=${RUN_GROUP}
 WorkingDirectory=${WORKDIR}
 ExecStart=${JAVA_BIN} ${JAVA_ARGS[*]}
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=30
 
-# Hardening (reasonable defaults; remove lines if something breaks)
+# Minimal hardening that usually won't break auth/token storage
 NoNewPrivileges=true
 PrivateTmp=true
-ProtectSystem=full
-ProtectHome=true
-ReadWritePaths=${HYTALE_DIR}
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-# --- Apply + enable ---
 systemctl daemon-reload
 systemctl enable "${SERVICE_NAME}.service"
 
