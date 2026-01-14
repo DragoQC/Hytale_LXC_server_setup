@@ -39,7 +39,7 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/DragoQC/Hytale_LXC_serve
 > This links the server to your Hytale account and enables encrypted credential storage.
 
 ## ⚙️ Create the systemd service (optional but recommended)
-
+### CURRNELTY NOT WORKING ASK LOGIN EVERYTIME
 > - To run the server automatically at boot, create the systemd service:
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/DragoQC/Hytale_LXC_server_setup/main/create-service.sh)"
