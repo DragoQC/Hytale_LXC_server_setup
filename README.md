@@ -26,15 +26,12 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/DragoQC/Hytale_LXC_serve
 
 ## 🔐 Authentication (required)
 
-> - After the server starts for the first time, authenticate it:
-
+> **After the server starts for the first time, authenticate it:**
 > - Open the URL shown in the terminal
-
 > - Enter the provided authorization code
-
 > - Wait for the CLI to continue automatically
 
-> Once the server console is available, run:
+- Once the server console is available, run:
 ```bash
 /auth login device
 /auth persistence Encrypted
