@@ -1,6 +1,4 @@
-apt update && apt upgrade -y
-
-apt install -y curl unzip
+apt install -y  unzip
 
 #Install Temurin
 echo "deb [arch=amd64] https://some.repository.url focal main" | sudo tee /etc/apt/sources.list.d/adoptium.list > /dev/null
@@ -26,8 +24,3 @@ unzip -o /opt/hytale_server/game.zip -d /opt/hytale_server/
 java -jar /opt/hytale_server/Server/HytaleServer.jar --assets /opt/hytale_server/Assets.zip
 
 
-#AFTER START
-#authenticate server
-/auth login device
-#switch to encrypted
-/auth persistence Encrypted
